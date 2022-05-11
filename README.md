@@ -90,7 +90,7 @@ Comprobar
 
 #### Otras herramientas interesantes para chequear
 
-Instalar `kubecolor` [link](https://github.com/hidetatz/kubecolor/releases)
+#### Instalar `kubecolor` [link](https://github.com/hidetatz/kubecolor/releases)
 
 <details>
   <summary>En linux</summary>
@@ -215,8 +215,9 @@ kube-public            Active   47h
 kube-system            Active   47h
 kubernetes-dashboard   Active   47h
 ```
-
 </details>
+
+___
 
 ### [Pods](https://kubernetes.io/docs/concepts/workloads/pods/)
 Son las unidades más pequeñas que se pueden desplegar dentro de un cluster de kubernetes, son un set de contenedores el 
@@ -237,7 +238,7 @@ nginx-85b98978db-hjf68   1/1     Running   0          55m
 
 Comando crear pod
 ```bash
-kubectl apply -f ./deployments/pod/simple-pod-nginx.yaml
+kubectl apply -f ./files/simple-pod-nginx.yaml
 ```
 Comando estado del pod
 ```bash
@@ -262,6 +263,8 @@ spec:
     image: nginx:alpine
 ```
 </details>
+
+___
 
 ### [Deployment](https://kubernetes.io/es/docs/concepts/workloads/controllers/deployment/)
 Es un tipo de controlador de k8s, Es la unidad de más alto nivel que podemos gestionar en Kubernetes. 
@@ -334,7 +337,7 @@ spec:
 
 Crear deployment
 ```bash
-kubectl apply -f ./deployments/simple-deployment.yaml
+kubectl apply -f ./files/simple-deployment.yaml
 ```
 Estado del deployment
 ```bash
@@ -344,14 +347,14 @@ Borrar deployment
 ```bash
 kubectl delete deployment nginx-deployment
 ```
-
-
-### [Deamonset](https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/)
+___
+### [Daemonset](https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/)
 Es otro tipo de controlador de k8s y muy similar al deployment, pero no tiene réplicas, este controlador lo que hace es 
-desplegar un pod por cada máquina que tenga el cluster, los casos de uso mas frecuentes son:
+desplegar un pod por cada máquina que tenga el cluster, es similar a los deployments pero no tiene la propiedad para 
+setear las replicaslos casos de uso mas frecuentes son:
 
-- Monitoreo del cluster
-- Recoleccion de logs del cluster
+- Monitoreo de los nodos del cluster
+- Recoleccion de logs de los nodos del cluster
 
 ```bash
 kubectl get daemonset
@@ -413,15 +416,15 @@ spec:
 
 Crear daemonset
 ```bash
-kubectl apply -f ./deployments/simple-daemonset.yaml
+kubectl apply -f ./files/simple-daemonset.yaml
 ```
 Estado del daemonset
 ```bash
-kubectl get daemonset nginx-deployment
+kubectl get daemonset nginx-daemonset
 ```
 Borrar daemonset
 ```bash
-kubectl delete daemonset nginx-deployment
+kubectl delete daemonset nginx-daemonset
 ```
 
 

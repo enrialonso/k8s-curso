@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
-  name: nginx-deployment
+  name: nginx-daemonset
 spec:
   selector:
     matchLabels:
