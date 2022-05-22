@@ -4,7 +4,7 @@ ________________________
 
 ### Fuentes
 
-- PeladoNerd - [channel](https://www.youtube.com/channel/UCrBzBOMcUVV8ryyAU_c6P5g)
+- PeladoNerd - [Canal YouTube](https://www.youtube.com/channel/UCrBzBOMcUVV8ryyAU_c6P5g)
     - Video [KUBERNETES 2021 - De NOVATO a PRO! (CURSO COMPLETO)](https://www.youtube.com/watch?v=DCoBcpOA7W4)
 - Udemy: [Kubernetes: Desde cero para principiantes | ¡Con Ejercicios!](https://www.udemy.com/course/kubernetes-aprende/)
 
@@ -98,17 +98,22 @@ Comprobar
 - Descargar el binario - [link](https://github.com/hidetatz/kubecolor/releases)
 - Descomprimir el binario
 
-Instalar
+```bash
+curl -LO https://github.com/hidetatz/kubecolor/releases/download/v0.0.20/kubecolor_0.0.20_Linux_x86_64.tar.gz
+tar -xf kubecolor_0.0.20_Linux_x86_64.tar.gz kubecolor
+```
 
-  ```bash
-  sudo install kubecolor /usr/local/bin/kubecolor
-  ```
+**Instalar**
 
-Comprobar
+```bash
+sudo install kubecolor /usr/local/bin/kubecolor
+```
 
-  ```bash
-  kubecolor version
-  ```
+**Comprobar**
+
+```bash
+kubecolor version
+```
 
   <details>
     <summary>Salida</summary>
@@ -119,7 +124,7 @@ Comprobar
 
   </details>
 
-Configurar
+**Configurar**
 
 En el fichero del profile para la terminal (ejemplo: `~/.bashrc`) poner el alias
 
@@ -136,17 +141,21 @@ En el fichero del profile para la terminal (ejemplo: `~/.bashrc`) poner el alias
 
 - Descargar el binario - [link](https://k8slens.dev/desktop.html)
 
-Instalar
+```bash
+curl -LO https://api.k8slens.dev/binaries/Lens-5.4.6-latest.20220428.1.amd64.deb
+```
 
-  ```bash
-  sudo dpkg -i Lens-5.4.4-latest.20220325.1.amd64.deb
-  ```
+**Instalar**
 
-Comprobar
+```bash
+sudo dpkg -i Lens-5.4.6-latest.20220428.1.amd64.deb
+```
 
-  ```bash
-  lens --version 
-  ```
+**Comprobar**
+
+```bash
+lens --version 
+```
 
 </details>
 
@@ -170,6 +179,8 @@ minikube dashboard
 
 Con este comando abre en el navegador un dashboard web que está instalado por defecto en nuestro `minikube` para 
 interactuar con el cluster y obtener informacion de nuestro cluster.
+
+<img height="400" src="images/minikube-dashboard.png"/>
 
 ```bash
 minikube addons list
@@ -195,10 +206,12 @@ Lista todos los addons disponibles para `minikube` y podemos ver cuáles son los
 
 ### Conceptos basicos de Kubernetes
 
-#### [Namespaces](https://kubernetes.io/es/docs/concepts/overview/working-with-objects/namespaces/)
+### [Namespaces](https://kubernetes.io/es/docs/concepts/overview/working-with-objects/namespaces/)
 Kubernetes soporta múltiples clústeres virtuales respaldados por el mismo clúster físico. Estos clústeres virtuales se 
 denominan espacios de nombres (namespaces). Puedes separar de forma logica las cargas de trabajo dentro del cluster. 
 Existe algunos namespaces por defecto
+
+<img height="500" src="images/k8s-namespaces.png"/>
 
 ```bash
 kubectl get namespaces
@@ -220,8 +233,8 @@ kubernetes-dashboard   Active   47h
 ___
 
 ### [Pods](https://kubernetes.io/docs/concepts/workloads/pods/)
-Son las unidades más pequeñas que se pueden desplegar dentro de un cluster de kubernetes, son un set de contenedores el 
-cual puede albergar uno a más contenedores dentro.
+Son las unidades más pequeñas que se pueden desplegar dentro de un cluster de kubernetes, es la forma que tiene k8s de
+agrupar  uno o varios contenedores para una carga de trabajo.
 
 ```bash
 kubectl get pod
@@ -238,15 +251,15 @@ nginx-85b98978db-hjf68   1/1     Running   0          55m
 
 Comando crear pod
 ```bash
-kubectl apply -f ./files/simple-pod-nginx.yaml
+kubectl apply -f ./files/simple-pod.yaml
 ```
 Comando estado del pod
 ```bash
-kubectl get pod nginx -o wide
+kubectl get pod simple-pod -o wide
 ```
 Comando borrar pod
 ```bash
-kubectl delete pod nginx
+kubectl delete pod simple-pod
 ```
 
 <details>
@@ -256,7 +269,7 @@ kubectl delete pod nginx
 apiVersion: v1
 kind: Pod
 metadata:
-  name: nginx
+  name: simple-pod
 spec:
   containers:
   - name: nginx
@@ -267,7 +280,7 @@ spec:
 ___
 
 ### [Deployment](https://kubernetes.io/es/docs/concepts/workloads/controllers/deployment/)
-Es un tipo de controlador de k8s, Es la unidad de más alto nivel que podemos gestionar en Kubernetes. 
+Es un tipo de controlador de k8s, ss la unidad de más alto nivel que podemos gestionar en Kubernetes. 
 Nos permite definir diferentes funciones:
 
 - Control de réplicas
@@ -350,8 +363,8 @@ kubectl delete deployment nginx-deployment
 ___
 ### [Daemonset](https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/)
 Es otro tipo de controlador de k8s y muy similar al deployment, pero no tiene réplicas, este controlador lo que hace es 
-desplegar un pod por cada máquina que tenga el cluster, es similar a los deployments pero no tiene la propiedad para 
-setear las replicaslos casos de uso mas frecuentes son:
+desplegar un pod o pods por cada máquina que tenga el cluster, es similar a los deployments pero no tiene la propiedad para 
+setear las replicas los casos de uso mas frecuentes son:
 
 - Monitoreo de los nodos del cluster
 - Recoleccion de logs de los nodos del cluster
@@ -427,17 +440,105 @@ Borrar daemonset
 kubectl delete daemonset nginx-daemonset
 ```
 
+___
+### [Statefulset](https://kubernetes.io/es/docs/concepts/workloads/controllers/statefulset/)
+También es una forma de crear pods, pero con un volumen asociado para mantener el estado, es decir que es como un deployment 
+en el que cada pod tiene asociado un volumen de almacenamiento unico por pod en donde el pod y solo ese pod lo usa para 
+mantener el estado de la aplicacion.
 
+<img height="600" src="images/statefulset.png"/>
 
+```bash
+kubectl get statefulset
+```
 
+<details>
+  <summary>Salida</summary>
 
+```bash
+NAME               DESIRED   CURRENT   READY   UP-TO-DATE   AVAILABLE   NODE SELECTOR   AGE
+nginx-deployment   1         1         0       1            0           <none>          4s
+```
+</details>
 
+Ejemplo de manifiesto para un daemonset
 
+<details>
+  <summary>Manifiesto</summary>
 
+```yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: simple-statefulset
+spec:
+  serviceName: nginx
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+        - name: nginx
+          image: k8s.gcr.io/nginx-slim:0.8
+          ports:
+            - containerPort: 80
+              name: web
+          volumeMounts:
+            - name: www
+              mountPath: /usr/share/nginx/html
+  volumeClaimTemplates:
+    - metadata:
+        name: www
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        resources:
+          requests:
+            storage: 1Gi
+```
+</details>
 
+Crear statefulset
+```bash
+kubectl apply -f ./files/simple-statefulset.yaml
+```
+Estado del statefulset
+```bash
+kubectl get statefulset simple-statefulset
+```
+Borrar statefulset
+```bash
+kubectl delete statefulset simple-statefulset
+```
+____
+### Networking en k8s
 
+Las comunicaciones entre aplicaciones esta a la orden del dia, y es muy dificil encontrar una aplicacion hoy por hoy 
+que no necesite comunicarse con el entorno que le rodea. Esto no es distinto dentro de un cluster de k8s, es mas, de primeras
+complica más las cosas porque k8s va de compartir instancias o nodos entre aplicaciones, donde los pods pueden estar desplegados
+en distintos nodos y aun asi tiene que mantener la comunicacion.
 
+En esta parte de la [documentacion oficial](https://kubernetes.io/docs/concepts/services-networking/) puedes tener mas 
+detalle.
 
+![](images/basic-networking-k8s.png)
 
+En la imagen de arriba hay varias cosas que tenemos que tener en cuenta
 
+- Las ip de los nodos es distinta a la ip de los pods.
+- Cada pod tiene una IP.
+- Los containers dentro de un pod comparten la ip del pod que los contiene.
+- `etcd` es la base de datos de k8s y es donde se almacena y comparte el estado del cluster entre los nodos.
+- Los `CNI` o Container network interface.
+- Los agentes que corren en todos los nodos (workers en la imagen) en este caso `calico`
+  - `calico` en un CNI que se encarga del manejo de las redes en el cluster, existen otro tipo de CNI, aqui puedes conocer [otros](https://kubernetes.io/docs/concepts/cluster-administration/networking/#calico)
+- Las `route-tables` creadas por el agente de CNI en el caso de la imagen `calico`.
+- Toda la informacion de las `route-tables` se almacena en `etcd`.
+
+En la imagen tenemos dos nodos con un pod en cada uno, si estos pods quieren comunicarse, el agente CNI almacenaria
+en `etcd` las `route-tables` para se pueda establecer la comunicacion entre pods en el mismo o distintos nodos.
 
