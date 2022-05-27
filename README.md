@@ -1,12 +1,9 @@
-# Curso k8s
-
-________________________
+# Mini Curso k8s
 
 ### Fuentes
 
 - PeladoNerd - [Canal YouTube](https://www.youtube.com/channel/UCrBzBOMcUVV8ryyAU_c6P5g)
     - Video [KUBERNETES 2021 - De NOVATO a PRO! (CURSO COMPLETO)](https://www.youtube.com/watch?v=DCoBcpOA7W4)
-- Udemy: [Kubernetes: Desde cero para principiantes | ¡Con Ejercicios!](https://www.udemy.com/course/kubernetes-aprende/)
 
 Documentacion oficial de k8s: https://kubernetes.io/es/
 
@@ -533,12 +530,146 @@ En la imagen de arriba hay varias cosas que tenemos que tener en cuenta
 - Cada pod tiene una IP.
 - Los containers dentro de un pod comparten la ip del pod que los contiene.
 - `etcd` es la base de datos de k8s y es donde se almacena y comparte el estado del cluster entre los nodos.
-- Los `CNI` o Container network interface.
-- Los agentes que corren en todos los nodos (workers en la imagen) en este caso `calico`
-  - `calico` en un CNI que se encarga del manejo de las redes en el cluster, existen otro tipo de CNI, aqui puedes conocer [otros](https://kubernetes.io/docs/concepts/cluster-administration/networking/#calico)
+- Los `CNI` o **Container network interface**, son agentes que corren en todos los nodos (workers en la imagen) en este caso 
+`calico`
+  - `calico` en un CNI que se encarga del manejo de las redes en el cluster, existen otros tipos de CNI, [aqui](https://kubernetes.io/docs/concepts/cluster-administration/networking/#calico) los puedes conocer.
 - Las `route-tables` creadas por el agente de CNI en el caso de la imagen `calico`.
 - Toda la informacion de las `route-tables` se almacena en `etcd`.
 
 En la imagen tenemos dos nodos con un pod en cada uno, si estos pods quieren comunicarse, el agente CNI almacenaria
-en `etcd` las `route-tables` para se pueda establecer la comunicacion entre pods en el mismo o distintos nodos.
+en `etcd` las `route-tables` para se pueda establecer la comunicacion entre pods, cuando se crea un pod una de las 
+primeras cosas que se hace es asignarle una ip, esto lo hace el agente del CNI, se almacena en `etcd`. Tambien se borra 
+esta configuracion cuando sé borrar el pod, todo esto es trasparente para nosotros y lo hace el propio CNI.
+
+**Articulos y videos destacados que hablan del tema**
+
+- Video [Desmitificando el networking en Kubernetes - Nerdearla 2018](https://www.youtube.com/watch?v=Q650LveSHy0)
+- Video [Container Network Interface (CNI) Simplified | Kubernetes Networking | Pod Security Group](https://www.youtube.com/watch?v=kA0C44nTwjU&t=1042s)
+- Doc Oficial k8s [aqui](https://kubernetes.io/docs/concepts/services-networking/)
+- [How Kubernetes Networking Works – The Basics](https://blog.neuvector.com/article/kubernetes-networking)
+- [Kubernetes (V): networking y políticas de red](https://tangelov.me/posts/kubernetes-v.html#:~:text=Networking%20en%20Kubernetes,del%20proyecto.)
+____
+### Services
+
+Es un objeto de la API de k8s en el que se define como conectarnos a las aplicaciones o pods, básicamente un service 
+lo que hacemos es agrupar lógicamente un conjunto de pods y definir una politica de entrada, de esta forma no tenemos que 
+conocer la ip de los pods para comunicarnos. Existen distintos tipos de services:
+
+* **ClusterIP**: expone una ip fija en el cluster. (Por defecto)
+* **NodePort**: expone un puerto en cada nodo.
+* **LoadBalancer**: crea un balanceador de carga (depende del proveedor de cloud que usemos) que redirecciona el tráfico 
+a los pods.
+
+#### Service Cluster IP (no recomendado para entornos productivos)
+
+Este servicio se crea por defecto si no se define la etiqueta `type` en el manifiesto del service, este service mapea 
+una ip interna del cluster con la ip de los pods, este mapeo se realiza con la definicion de un selector el cual debe 
+estar presente e igual en el manifiesto del service y del deployment, asi el service puede identificar y agrupar las ips 
+de los pods para que puedan ser alcanzadas por la ip del cluster cuando hacemos una petition a esta.
+
+<details>
+  <summary>Manifiesto de un service Cluster IP</summary>
+
+```yaml
+# Manifiesto del service
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-cluster-ip
+spec:
+  ports:
+    - port: 80
+      targetPort: 8080
+  selector:
+    role: role-cluster-ip <<< SELECTOR
+```
+
+```yaml
+# Manifiesto del deployment
+...
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      role: role-cluster-ip <<< SELECTOR
+...
+```
+
+</details>
+
+Aplicar un deployment + service de tipo Clister IP
+```bash
+kubectl apply -f "./files/service-cluster-ip.yaml"
+```
+
+Listar todo el cluster
+```bash
+kubectl get all -o wide
+```
+
+Si listamos todo el cluster podemos ver que estarían los pods creados por el deployment `pod/app-service-cluster-ip...` 
+como también el service `service/service-cluster-ip` que estaba en el deployment 
+(pudimos declarar el service en un manifiesto aparte también)
+
+```bash
+NAME                                          READY   STATUS    RESTARTS   AGE   IP           NODE       NOMINATED NODE   READINESS GATES
+pod/app-service-cluster-ip-67cd8b5645-4tgr4   1/1     Running   0          20s   172.17.0.7   minikube   <none>           <none>
+pod/app-service-cluster-ip-67cd8b5645-9dxsw   1/1     Running   0          20s   172.17.0.5   minikube   <none>           <none>
+pod/app-service-cluster-ip-67cd8b5645-sxxrj   1/1     Running   0          20s   172.17.0.6   minikube   <none>           <none>
+
+NAME                         TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)    AGE     SELECTOR
+service/kubernetes           ClusterIP   10.96.0.1      <none>        443/TCP    5d19h   <none>
+service/service-cluster-ip   ClusterIP   10.99.100.91   <none>        8080/TCP   20s     role=role-cluster-ip
+```
+
+Si describimos el service podemos encontrar mas information 
+
+```bash
+kubectl describe svc service-cluster-ip
+```
+
+<details>
+  <summary>Salida</summary>
+
+```yaml
+Name:              service-cluster-ip
+Namespace:         default
+Labels:            <none>
+Annotations:       <none>
+Selector:          role=role-cluster-ip
+Type:              ClusterIP
+IP Family Policy:  SingleStack
+IP Families:       IPv4
+IP:                10.99.100.91
+IPs:               10.99.100.91
+Port:              <unset>  80/TCP
+TargetPort:        8080/TCP
+Endpoints:         172.17.0.5:8080,172.17.0.6:8080,172.17.0.7:8080
+Session Affinity:  None
+Events:            <none>
+```
+</details>
+
+Para hacer peticiones a los pods solo podemos hacerlo desde dentro del cluster, para esto aplicamos un deployment con 
+un pod. Desde ahi podemos hacer peticiones en a los pods de la app.
+
+```bash
+kubectl apply -f ./file/bastion.yaml
+```
+
+Nos metemos dentro del pod `bastion`
+
+```bash
+kubectl exec -it bastion -- sh
+```
+
+Con la terminal dentro del pod podemos hacer un `curl [ip service]:[port service]` y ver la respuesta de los pods, 
+el service debería de balancear las peticiones entre los distintos pod.
+
+```bash
+curl 10.99.100.91:80
+Hello, world!
+Version: 1.0.0
+Hostname: app-service-cluster-ip-67cd8b5645-sxxrj
+```
 

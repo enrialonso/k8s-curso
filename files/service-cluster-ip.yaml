@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-service-cluster-ip
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      role: role-cluster-ip
+  template:
+    metadata:
+      labels:
+        role: role-cluster-ip
+    spec:
+      containers:
+        - name: hello-app
+          image: gcr.io/google-samples/hello-app:1.0
+          ports:
+            - containerPort: 8080
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-cluster-ip
+spec:
+  ports:
+    - port: 80
+      targetPort: 8080
+  selector:
+    role: role-cluster-ip
