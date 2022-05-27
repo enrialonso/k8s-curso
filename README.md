@@ -562,7 +562,7 @@ a los pods.
 
 #### Service Cluster IP (no recomendado para entornos productivos)
 
-Este servicio se crea por defecto si no se define la etiqueta `type` en el manifiesto del service, este service mapea 
+Este service se crea por defecto si no se define la etiqueta `type` en el manifiesto, se mapea 
 una ip interna del cluster con la ip de los pods, este mapeo se realiza con la definicion de un selector el cual debe 
 estar presente e igual en el manifiesto del service y del deployment, asi el service puede identificar y agrupar las ips 
 de los pods para que puedan ser alcanzadas por la ip del cluster cuando hacemos una petition a esta.
@@ -597,7 +597,7 @@ spec:
 
 </details>
 
-Aplicar un deployment + service de tipo Clister IP
+Aplicar un deployment + service de tipo Cluster IP
 ```bash
 kubectl apply -f "./files/service-cluster-ip.yaml"
 ```
@@ -664,12 +664,74 @@ kubectl exec -it bastion -- sh
 ```
 
 Con la terminal dentro del pod podemos hacer un `curl [ip service]:[port service]` y ver la respuesta de los pods, 
-el service debería de balancear las peticiones entre los distintos pod.
+el service debería de balancear las peticiones entre los distintos pods.
 
 ```bash
 curl 10.99.100.91:80
+---
 Hello, world!
 Version: 1.0.0
 Hostname: app-service-cluster-ip-67cd8b5645-sxxrj
 ```
 
+También podemos hacer un `curl` al nombre del service `service-cluster-ip`
+
+```bash
+curl http://service-cluster-ip
+---
+Hello, world!
+Version: 1.0.0
+Hostname: app-service-cluster-ip-67cd8b5645-478tb
+```
+
+#### Service Node Port
+
+Este service expone un puerto en cada uno de los nodos del cluster y mapea el tráfico de ese puerto al service que 
+agrupa los pods de nuestra aplicacion.
+
+<details>
+  <summary>Manifiesto de un service Node Port</summary>
+
+Nótese que a diferencia del manifiesto de cluster ip, node port tiene que tener `spec.type` igual a `NodePort` y para 
+crear el puerto en cada uno de los nodos y que quede expuesto tambien la etiqueta `spec.ports[].nodePort` con el número 
+del puerto que queremos exponer.
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-node-port
+spec:
+  type: NodePort
+  ports:
+    - port: 80
+      targetPort: 8080
+      nodePort: 30000
+  selector:
+    role: role-node-port <<< SELECTOR
+```
+
+</details>
+
+Aplicar un deployment + service de tipo Node Port
+```bash
+kubectl apply -f "./files/service-node-port.yaml"
+```
+
+Ahora si queremos conectarnos por el service a los pods de la aplicacion debemos conocer la ip de los nodos del cluster
+
+```bash
+kubectl get nodes -o wide
+___
+NAME       STATUS   ROLES                  AGE     VERSION   INTERNAL-IP    EXTERNAL-IP   OS-IMAGE             KERNEL-VERSION      CONTAINER-RUNTIME
+minikube   Ready    control-plane,master   5d21h   v1.23.3   192.168.49.2   <none>        Ubuntu 20.04.2 LTS   5.15.0-33-generic   docker://20.10.12
+```
+
+También si usas `minikube` puedes correr el siguiente comando, devuelve la ip del nodo con el puerto del service que 
+configuramos en el manifiesto. Puedes acceder desde el navegador o haciendo un `curl`.
+
+```bash
+minikube service service-node-port --url
+___
+http://192.168.49.2:30000
+```
