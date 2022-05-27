@@ -668,7 +668,8 @@ el service debería de balancear las peticiones entre los distintos pods.
 
 ```bash
 curl 10.99.100.91:80
----
+```
+```bash
 Hello, world!
 Version: 1.0.0
 Hostname: app-service-cluster-ip-67cd8b5645-sxxrj
@@ -678,7 +679,8 @@ También podemos hacer un `curl` al nombre del service `service-cluster-ip`
 
 ```bash
 curl http://service-cluster-ip
----
+```
+```bash
 Hello, world!
 Version: 1.0.0
 Hostname: app-service-cluster-ip-67cd8b5645-478tb
@@ -722,10 +724,13 @@ Ahora si queremos conectarnos por el service a los pods de la aplicacion debemos
 
 ```bash
 kubectl get nodes -o wide
-___
+```
+```bash
 NAME       STATUS   ROLES                  AGE     VERSION   INTERNAL-IP    EXTERNAL-IP   OS-IMAGE             KERNEL-VERSION      CONTAINER-RUNTIME
 minikube   Ready    control-plane,master   5d21h   v1.23.3   192.168.49.2   <none>        Ubuntu 20.04.2 LTS   5.15.0-33-generic   docker://20.10.12
 ```
+
+
 
 También si usas `minikube` puedes correr el siguiente comando, devuelve la ip del nodo con el puerto del service que 
 configuramos en el manifiesto. Puedes acceder desde el navegador o haciendo un `curl`.
@@ -734,4 +739,94 @@ configuramos en el manifiesto. Puedes acceder desde el navegador o haciendo un `
 minikube service service-node-port --url
 ___
 http://192.168.49.2:30000
+```
+
+#### Service LoadBalancer
+
+En este caso dependiendo de donde este montado el cluster cuando creamos un service de tipo load balancer crea algo similar 
+a un node port pero pone delante un load balancer para hacer de punto unico de entrada para los pods, si estamos en la nube
+creara un balanceador segun el proveedor de nube, en el caso de `minikube` se debe tener abierto una terminal corriendo 
+un comando para que el service pueda tomar una ip y exponer los pods de la aplicacion.
+
+<details>
+  <summary>Manifiesto de un service Load Balancer</summary>
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-load-balancer
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 80
+      targetPort: 8080
+      nodePort: 30000
+  selector:
+    role: role-load-balancer <<< SELECTOR
+```
+
+Si no configuramos la propiedad `spec.ports[].nodePort` k8s nos provee de un puerto que va desde **30000** al **32767**.
+
+</details>
+
+Para crear un service con `minikube`:
+
+En una termina aparte ejecutamos el siguiente comando para levantar un tunnel y poder conectar el load balancer, dejaremos
+el comando ejecutando sin cerrar la terminal
+
+```bash
+minikube tunnel
+```
+
+<details>
+  <summary>Salida</summary>
+
+```bash
+Status: 
+    machine: minikube
+    pid: 125254
+    route: 10.96.0.0/12 -> 192.168.49.2
+    minikube: Running
+    services: [service-load-balancer]
+errors: 
+    minikube: no errors
+    router: no errors
+    loadbalancer emulator: no errors
+```
+</details>
+
+Aplicar el deployment en otra terminal
+
+```bash
+kubectl -apply -f ./files/service-load-balancer.yaml
+```
+
+Ahora si vemos que tenemos desplegado en el cluster deberíamos tener algo similar a esto
+
+```bash
+kubectl get all
+```
+
+```bash
+NAME                                             READY   STATUS    RESTARTS   AGE   IP           NODE       NOMINATED NODE   READINESS GATES
+pod/app-service-load-balancer-57f56b48c8-7gbjq   1/1     Running   0          7s    172.17.0.7   minikube   <none>           <none>
+pod/app-service-load-balancer-57f56b48c8-f6sbq   1/1     Running   0          7s    172.17.0.4   minikube   <none>           <none>
+pod/app-service-load-balancer-57f56b48c8-p6mzq   1/1     Running   0          7s    172.17.0.3   minikube   <none>           <none>
+
+NAME                            TYPE           CLUSTER-IP       EXTERNAL-IP      PORT(S)        AGE    SELECTOR
+service/kubernetes              ClusterIP      10.96.0.1        <none>           443/TCP        6d1h   <none>
+service/service-load-balancer   LoadBalancer   10.105.169.212   10.105.169.212   80:30000/TCP   7s     role=role-load-balancer
+```
+
+Si copiamos la Ip externa del `service/service-load-balancer` y la abrimos en un navegador o hacemos un curl desde 
+consola deberíamos poder llagar a los pods y balancear sobre ellos con distintas respuestas.
+
+```bash
+curl http://10.105.169.212
+```
+```bash
+Hello, world!
+Version: 1.0.0
+Hostname: app-service-load-balancer-57f56b48c8-f6sbq
 ```

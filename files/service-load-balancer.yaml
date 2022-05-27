@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-service-load-balancer
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      role: role-load-balancer
+  template:
+    metadata:
+      labels:
+        role: role-load-balancer
+    spec:
+      containers:
+        - name: hello-app
+          image: gcr.io/google-samples/hello-app:1.0
+          ports:
+            - containerPort: 8080
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-load-balancer
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 80
+      targetPort: 8080
+      nodePort: 30000
+  selector:
+    role: role-load-balancer
