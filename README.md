@@ -549,7 +549,7 @@ esta configuracion cuando sé borrar el pod, todo esto es trasparente para nosot
 - [How Kubernetes Networking Works – The Basics](https://blog.neuvector.com/article/kubernetes-networking)
 - [Kubernetes (V): networking y políticas de red](https://tangelov.me/posts/kubernetes-v.html#:~:text=Networking%20en%20Kubernetes,del%20proyecto.)
 ____
-### Services
+### [Services](https://kubernetes.io/es/docs/concepts/services-networking/service/)
 
 Es un objeto de la API de k8s en el que se define como conectarnos a las aplicaciones o pods, básicamente un service 
 lo que hacemos es agrupar lógicamente un conjunto de pods y definir una politica de entrada, de esta forma no tenemos que 
@@ -560,7 +560,7 @@ conocer la ip de los pods para comunicarnos. Existen distintos tipos de services
 * **LoadBalancer**: crea un balanceador de carga (depende del proveedor de cloud que usemos) que redirecciona el tráfico 
 a los pods.
 
-#### Service Cluster IP (no recomendado para entornos productivos)
+#### [Service Cluster IP](https://kubernetes.io/es/docs/concepts/services-networking/service/#definiendo-un-service) (no recomendado para entornos productivos)
 
 Este service se crea por defecto si no se define la etiqueta `type` en el manifiesto, se mapea 
 una ip interna del cluster con la ip de los pods, este mapeo se realiza con la definicion de un selector el cual debe 
@@ -686,7 +686,7 @@ Version: 1.0.0
 Hostname: app-service-cluster-ip-67cd8b5645-478tb
 ```
 
-#### Service Node Port
+#### [Service Node Port](https://kubernetes.io/es/docs/concepts/services-networking/service/#tipo-nodeport)
 
 Este service expone un puerto en cada uno de los nodos del cluster y mapea el tráfico de ese puerto al service que 
 agrupa los pods de nuestra aplicacion.
@@ -741,7 +741,7 @@ ___
 http://192.168.49.2:30000
 ```
 
-#### Service LoadBalancer
+#### [Service LoadBalancer](https://kubernetes.io/es/docs/concepts/services-networking/service/#loadbalancer)
 
 En este caso dependiendo de donde este montado el cluster cuando creamos un service de tipo load balancer crea algo similar 
 a un node port pero pone delante un load balancer para hacer de punto unico de entrada para los pods, si estamos en la nube
@@ -831,13 +831,16 @@ Version: 1.0.0
 Hostname: app-service-load-balancer-57f56b48c8-f6sbq
 ```
 
-## Ingress
+## [Ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/)
 
 Es un tipo de controlador que permite al acceso a nuestras aplicaciones en k8s comunicarse con el exterior como unico 
 punto de entrada, en donde podemos apuntar a distintas aplicaciones o deployments definiendo por ejemplo distintos paths
-en la url o reglas en el manifiesto del ingress. Podemos decir que los ingress son una pieza externa y que debemos 
-instalarla en el cluster, existen varios proveedores, dependiendo la naturaleza de nuestro cluster podremos usar uno u otro,
+en la url o reglas en el manifiesto del ingress. 
+
+Podemos decir que los ingress son una pieza externa y que debemos instalarla en el cluster, existen varios proveedores, 
+dependiendo la naturaleza de nuestro cluster podremos usar uno u otro,
 en este [enlace](https://kubernetes.io/docs/concepts/services-networking/ingress-controllers/) pueden ver algunos.
+
 Un ingress debería ser capas de balancear carga en nuestras aplicaciones como también manejar conexiones SSL/TLS, 
 la configuracion puede variar segun el proveedor del ingress controler.
 
@@ -845,10 +848,11 @@ la configuracion puede variar segun el proveedor del ingress controler.
 
 En la imagen se aprecia como funciona el acceso de un ingress a nuestras aplicaciones, el cliente hace una 
 peticion al ingress el cual evalua las reglas de enrutamiento definidas en el manifiesto, esta reglas tienen asociado un
-`service` el cual a su vez tiene como target los pods del deployment de nuestras aplicacions. Asi desde un unico punto de 
-entrada se pueden hacer peticiones a distintas aplicaciones, con los services no podríamos hacer esto. 
+`service` el cual a su vez tiene como target los pods del deployment de nuestras aplicacions. 
 
-Manifiesto de un ingress
+Asi desde un unico punto de entrada se pueden hacer peticiones a distintas aplicaciones, con los services no podríamos hacer esto. 
+
+Manifiesto para un ingress
 
 ```yaml
 apiVersion: networking.k8s.io/v1
