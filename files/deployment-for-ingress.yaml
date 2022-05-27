@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-ingress-v1
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      role: app-ingress-v1
+  template:
+    metadata:
+      labels:
+        role: app-ingress-v1
+    spec:
+      containers:
+      - name: app-v1
+        image: gcr.io/google-samples/hello-app:1.0
+        ports:
+        - containerPort: 8080
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-ingress-v2
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      role: app-ingress-v2
+  template:
+    metadata:
+      labels:
+        role: app-ingress-v2
+    spec:
+      containers:
+      - name: app-v2
+        image: gcr.io/google-samples/hello-app:2.0
+        ports:
+        - containerPort: 8080
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-app-v1
+spec:
+  type: NodePort
+  ports:
+  - port: 8080
+    targetPort: 8080
+  selector:
+    role: app-ingress-v1
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-app-v2
+spec:
+  type: NodePort
+  ports:
+  - port: 8080
+    targetPort: 8080
+  selector:
+    role: app-ingress-v2

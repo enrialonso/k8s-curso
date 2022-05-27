@@ -770,9 +770,9 @@ Si no configuramos la propiedad `spec.ports[].nodePort` k8s nos provee de un pue
 
 </details>
 
-Para crear un service con `minikube`:
+Para crear un service de este tipo con `minikube`:
 
-En una termina aparte ejecutamos el siguiente comando para levantar un tunnel y poder conectar el load balancer, dejaremos
+En una termina aparte ejecutamos el siguiente comando para levantar un `tunnel` y poder conectar el load balancer, dejaremos
 el comando ejecutando sin cerrar la terminal
 
 ```bash
@@ -805,7 +805,7 @@ kubectl -apply -f ./files/service-load-balancer.yaml
 Ahora si vemos que tenemos desplegado en el cluster deberíamos tener algo similar a esto
 
 ```bash
-kubectl get all
+kubectl get all -o wide
 ```
 
 ```bash
@@ -830,3 +830,138 @@ Hello, world!
 Version: 1.0.0
 Hostname: app-service-load-balancer-57f56b48c8-f6sbq
 ```
+
+## Ingress
+
+Es un tipo de controlador que permite al acceso a nuestras aplicaciones en k8s comunicarse con el exterior como unico 
+punto de entrada, en donde podemos apuntar a distintas aplicaciones o deployments definiendo por ejemplo distintos paths
+en la url o reglas en el manifiesto del ingress. Podemos decir que los ingress son una pieza externa y que debemos 
+instalarla en el cluster, existen varios proveedores, dependiendo la naturaleza de nuestro cluster podremos usar uno u otro,
+en este [enlace](https://kubernetes.io/docs/concepts/services-networking/ingress-controllers/) pueden ver algunos.
+Un ingress debería ser capas de balancear carga en nuestras aplicaciones como también manejar conexiones SSL/TLS, 
+la configuracion puede variar segun el proveedor del ingress controler.
+
+![](images/ingress-basic-diagram.png)
+
+En la imagen se aprecia como funciona el acceso de un ingress a nuestras aplicaciones, el cliente hace una 
+peticion al ingress el cual evalua las reglas de enrutamiento definidas en el manifiesto, esta reglas tienen asociado un
+`service` el cual a su vez tiene como target los pods del deployment de nuestras aplicacions. Asi desde un unico punto de 
+entrada se pueden hacer peticiones a distintas aplicaciones, con los services no podríamos hacer esto. 
+
+Manifiesto de un ingress
+
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: hello-app
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /v1
+        pathType: Prefix
+        backend:
+          service:
+            name: hello-v1
+            port:
+              number: 8080
+      - path: /v2
+        pathType: Prefix
+        backend:
+          service:
+            name: hello-v2
+            port:
+              number: 8080
+```
+
+En la propiedad `spec.rules[].http.paths[]` es donde declaramos las distintas reglas para una conexion en este caso 
+del tipo http.
+
+Para `minikube` vamos a habilitar el ingress en los addons
+
+```bash
+minikube addons enable ingress
+```
+
+verificamos que esta todo correcto
+
+```bash
+kubectl get pods -n ingress-nginx
+```
+
+```bash
+NAME                                       READY   STATUS      RESTARTS   AGE
+ingress-nginx-admission-create-h9nvg       0/1     Completed   0          94s
+ingress-nginx-admission-patch-4vk7d        0/1     Completed   1          94s
+ingress-nginx-controller-cc8496874-lslb5   1/1     Running     0          94s
+```
+
+Aplicar el deployment con las dos aplicaciones y los dos services
+
+```bash
+kubectl apply -f files/deployment-for-ingress.yaml
+```
+
+Aplicar el controlador ingress que hagan target a los dos services creados
+
+```bash
+kubectl apply -f ./files/simple-ingress.yaml
+```
+
+Ahora podemos verificar el ingress y las reglas con este comando
+
+```bash
+kubectl describe ingress simple-ingress
+```
+```bash
+Name:             simple-ingress
+Labels:           <none>
+Namespace:        default
+Address:          192.168.49.2
+Ingress Class:    nginx
+Default backend:  <default>
+Rules:
+  Host        Path  Backends
+  ----        ----  --------
+  *           
+              /v1   service-app-v1:8080 (172.17.0.11:8080,172.17.0.3:8080,172.17.0.7:8080)
+              /v2   service-app-v2:8080 (172.17.0.10:8080,172.17.0.4:8080,172.17.0.8:8080)
+Annotations:  <none>
+Events:
+  Type    Reason  Age                From                      Message
+  ----    ------  ----               ----                      -------
+  Normal  Sync    17m (x2 over 18m)  nginx-ingress-controller  Scheduled for sync
+```
+
+Ahora con la ip de nuestro cluster podríamos o bien hacer peticiones con el navegador o con `curl` para acceder a 
+nuestras aplicaciones
+
+```bash
+minikube ip
+```
+
+```bash
+curl http://http://192.168.49.2/v1
+```
+```bash
+Hello, world!
+Version: 1.0.0
+Hostname: app-ingress-v1-64b5dffcd8-chbrp
+```
+
+```bash
+curl http://http://192.168.49.2/v2
+```
+```bash
+Hello, world!
+Version: 2.0.0
+Hostname: app-ingress-v2-6b68575fd9-jl9fz
+```
+
+## ConfigMaps
+
+## Secrets
+
+## Stern
+
