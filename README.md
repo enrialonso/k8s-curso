@@ -512,7 +512,7 @@ Borrar statefulset
 kubectl delete statefulset simple-statefulset
 ```
 ____
-### Networking en k8s
+## [Networking en k8s](https://kubernetes.io/docs/concepts/services-networking/)
 
 Las comunicaciones entre aplicaciones esta a la orden del dia, y es muy dificil encontrar una aplicacion hoy por hoy 
 que no necesite comunicarse con el entorno que le rodea. Esto no es distinto dentro de un cluster de k8s, es mas, de primeras
@@ -967,7 +967,7 @@ Hostname: app-ingress-v2-6b68575fd9-jl9fz
 
 Este objeto como su nombre lo indica almacena configuraciones que puedan ser consultadas por las aplicaciones, puedes 
 leer los configmaps desde un deployment e inyectarlos en los pods como variables de entorno o como un volumen que 
-inyecta un fichero de solo lectura para que los pods lo usen
+inyecta un fichero de solo lectura para que los containers del pod lo usen.
 
 Manifiesto configmap
 
@@ -1029,7 +1029,7 @@ Vamos a usarlo desde un pod con el siguiente manifiesto
 kubectl apply -f ./files/pod-configmaps.yaml
 ```
 
-Entramos al pod y verificamos las variables de entorno y los ficheros en los volumenes
+Entramos al pod y verificamos las variables de entorno inyectadas y los ficheros en los volumenes
 
 ```bash
 kubectl exec -it pod-configmaps -- env
@@ -1047,11 +1047,20 @@ kubectl exec -it pod-configmaps -- cat /config/dummy-file-config
 dummy-var=dummy-value
 ```
 
-⚠ Importante saber que si actualizas los valores del configmap, en el pod solo se actualizara los ficheros del volumen, 
-las variables de entorno seguirían teniendo la misma configuracion. Para actualizar la configuracion se debería 
-reiniciar el pod para que se cargen las variables de entorno con los nuevos valores.
+>⚠ Importante saber que si actualizas los valores del configmap, en el pod solo se actualizaran los ficheros del volumen, 
+las variables de entorno seguirían siendo iguales. Para actualizar la configuracion se debería matar el pod para que 
+el deployment cre un pod nuevo y se mapeen los nuevos valores desde el configmap.
+
+>⚠ En caso de crear un pod y no existir el `configmap` saltarán errores y no se podría crear el pod.
+
+```bash
+...
+MountVolume.SetUp failed for volume "config" : configmap "simple-configmap" not found
+...
+Error: configmap "simple-configmap" not found
+```
 
 ## Secrets
 
-## Stern
+
 
