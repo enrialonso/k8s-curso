@@ -1047,6 +1047,10 @@ kubectl exec -it pod-configmaps -- cat /config/dummy-file-config
 dummy-var=dummy-value
 ```
 
+⚠ Importante saber que si actualizas los valores del configmap, en el pod solo se actualizara los ficheros del volumen, 
+las variables de entorno seguirían teniendo la misma configuracion. Para actualizar la configuracion se debería 
+reiniciar el pod para que se cargen las variables de entorno con los nuevos valores.
+
 ## Secrets
 
 ## Stern
