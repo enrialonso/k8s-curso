@@ -963,7 +963,7 @@ Version: 2.0.0
 Hostname: app-ingress-v2-6b68575fd9-jl9fz
 ```
 
-## [ConfigMaps](https://kubernetes.io/es/docs/concepts/configuration/configmap/ "target=_blank")
+## [ConfigMaps](https://kubernetes.io/es/docs/concepts/configuration/configmap/)
 
 Este objeto como su nombre lo indica almacena configuraciones que puedan ser consultadas por las aplicaciones, puedes 
 leer los configmaps desde un deployment e inyectarlos en los pods como variables de entorno o como un volumen que 
