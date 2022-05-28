@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: simple-configmap
+data:
+  dummy-var: dummy-value
+  dummy-file-config: |
+    dummy-var=dummy-value

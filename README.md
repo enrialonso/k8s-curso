@@ -888,7 +888,7 @@ Para `minikube` vamos a habilitar el ingress en los addons
 minikube addons enable ingress
 ```
 
-verificamos que esta todo correcto
+Verificamos que esta todo correcto
 
 ```bash
 kubectl get pods -n ingress-nginx
@@ -963,7 +963,89 @@ Version: 2.0.0
 Hostname: app-ingress-v2-6b68575fd9-jl9fz
 ```
 
-## ConfigMaps
+## [ConfigMaps](https://kubernetes.io/es/docs/concepts/configuration/configmap/)
+
+Este objeto como su nombre lo indica almacena configuraciones que puedan ser consultadas por las aplicaciones, puedes 
+leer los configmaps desde un deployment e inyectarlos en los pods como variables de entorno o como un volumen que 
+inyecta un fichero de solo lectura para que los pods lo usen
+
+Manifiesto configmap
+
+```yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: simple-configmap
+data:
+  dummy-var: dummy-value
+  dummy-file-config: |
+    dummy-var=dummy-value
+```
+
+<details>
+  <summary>Manifiesto del pod</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-configmaps
+spec:
+  containers:
+    - name: pod-configmaps
+      image: alpine/curl
+      args:
+        - sleep
+        - infinity
+      env:
+        - name: DUMMY_VAR
+          valueFrom:
+            configMapKeyRef:
+              name: simple-configmap
+              key: dummy-var
+      volumeMounts:
+        - name: config
+          mountPath: "/config"
+          readOnly: true
+  volumes:
+    - name: config
+      configMap:
+        name: simple-configmap
+        items:
+        - key: "dummy-file-config"
+          path: "dummy-file-config"
+```
+</details>
+
+Crear y aplicar un configmap
+
+```bash
+kubectl apply -f ./files/simple-configmap.yaml
+```
+
+Vamos a usarlo desde un pod con el siguiente manifiesto
+
+```bash
+kubectl apply -f ./files/pod-configmaps.yaml
+```
+
+Entramos al pod y verificamos las variables de entorno y los ficheros en los volumenes
+
+```bash
+kubectl exec -it pod-configmaps -- env
+```
+```bash
+...
+DUMMY_VAR=dummy-value <<< Configuracion inyectada
+...
+```
+
+```bash
+kubectl exec -it pod-configmaps -- cat /config/dummy-file-config
+```
+```text
+dummy-var=dummy-value
+```
 
 ## Secrets
 
