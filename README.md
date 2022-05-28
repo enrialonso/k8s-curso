@@ -1060,7 +1060,74 @@ MountVolume.SetUp failed for volume "config" : configmap "simple-configmap" not 
 Error: configmap "simple-configmap" not found
 ```
 
-## Secrets
+## [Secrets](https://kubernetes.io/es/docs/concepts/configuration/secret/)
 
+Con este objeto crearemos secretos que van a poder ser usados por nuestros pod, algo asi como los configmaps, pero 
+los valores de las variables esta vez están codificados en `base64`, estos valores son faciles de descodificar y no se
+recomienda guardar credenciales sensibles.
 
+Manifiesto
 
+```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: simple-secrets
+type: Opaque
+data:
+  username: YWRtaW4=
+  password: c3VwM3JwYXNzdzByZAo=
+```
+
+Crear un secret desde un minifiesto
+
+```bash
+kubectl apply -f ./files/simple-secrets.yaml
+```
+
+También podemos crear el secret con kubectl con el siguiente comando
+
+```bash
+kubectl create secret generic simple-secrets --from-literal=username=admin --from-literal=password=superpassword
+```
+
+<details>
+  <summary>Manifiesto del pod consumiendo secrets</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-secrets
+spec:
+  containers:
+    - name: pod-secrets
+      image: alpine/curl
+      args:
+        - sleep
+        - infinity
+      env:
+        - name: USERNAME
+          valueFrom:
+            secretMapKeyRef:
+              name: simple-secrets
+              key: username
+        - name: PASSWORD
+            valueFrom:
+              secretMapKeyRef:
+                name: simple-secrets
+                key: password
+```
+</details>
+
+Crear pod que lee los secrets
+
+```bash
+kubectl apply -f ./files/pod-secrets.yaml
+```
+
+Verificar si las variables de entorno están dentro del pod
+
+```bash
+kubectl exec -it pod-secrets -- env
+```
