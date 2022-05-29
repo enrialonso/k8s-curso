@@ -188,7 +188,7 @@ Lista todos los addons disponibles para `minikube` y podemos ver cuáles son los
 <details>
   <summary>Salida</summary>
 
-```bash
+```text
 |-----------------------------|----------|--------------|--------------------------------|
 |         ADDON NAME          | PROFILE  |    STATUS    |           MAINTAINER           |
 |-----------------------------|----------|--------------|--------------------------------|
@@ -205,8 +205,8 @@ Lista todos los addons disponibles para `minikube` y podemos ver cuáles son los
 
 ### [Namespaces](https://kubernetes.io/es/docs/concepts/overview/working-with-objects/namespaces/)
 Kubernetes soporta múltiples clústeres virtuales respaldados por el mismo clúster físico. Estos clústeres virtuales se 
-denominan espacios de nombres (namespaces). Puedes separar de forma logica las cargas de trabajo dentro del cluster. 
-Existe algunos namespaces por defecto
+denominan namespaces. Puedes separar de forma logica las cargas de trabajo dentro del cluster. 
+Existe algunos namespaces por defecto `default` por ejemplo.
 
 <img height="500" src="images/k8s-namespaces.png"/>
 
@@ -217,7 +217,7 @@ kubectl get namespaces
 <details>
   <summary>Salida</summary>
 
-```bash
+```text
 NAME                   STATUS   AGE
 default                Active   47h
 kube-node-lease        Active   47h
@@ -227,11 +227,34 @@ kubernetes-dashboard   Active   47h
 ```
 </details>
 
+Manifiesto de un namespace
+
+```yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: simple-namespace
+```
+
+Crear un namespace
+
+```bash
+kubectl apply -f ./files/simple-namespace.yaml
+```
+
+Borrar un namespace
+
+```bash
+kubectl delete namespace simple-namespace
+```
+
 ___
 
 ### [Pods](https://kubernetes.io/docs/concepts/workloads/pods/)
 Son las unidades más pequeñas que se pueden desplegar dentro de un cluster de kubernetes, es la forma que tiene k8s de
-agrupar  uno o varios contenedores para una carga de trabajo.
+agrupar uno o varios contenedores para las cargas de trabajo. Dentro de un pod pueden existir varios container, tambien 
+se les pueden adjuntar volumenes o volumenes persistentes. Los contenedores dentro del pod comparten IP y dentro del pod 
+la comunicación entre contenedores puedes realizarla con `localhost`.
 
 ```bash
 kubectl get pod
@@ -240,7 +263,7 @@ kubectl get pod
 <details>
   <summary>Salida</summary>
 
-```bash
+```text
 NAME                     READY   STATUS    RESTARTS   AGE
 nginx-85b98978db-hjf68   1/1     Running   0          55m
 ```
@@ -277,14 +300,17 @@ spec:
 ___
 
 ### [Deployment](https://kubernetes.io/es/docs/concepts/workloads/controllers/deployment/)
-Es un tipo de controlador de k8s, ss la unidad de más alto nivel que podemos gestionar en Kubernetes. 
+Es un tipo de controlador de k8s, es la unidad de más alto nivel que podemos gestionar en Kubernetes. 
 Nos permite definir diferentes funciones:
 
-- Control de réplicas
-- Escabilidad de pods
+- Control de réplicas.
+- Escalabilidad de pods
 - Actualizaciones continuas
 - Despliegues automáticos
 - Rollback a versiones anteriores
+
+La idea es manejar las cargas de trabajo basándonos en este controlador. Podemos definir el estado que deseado y 
+el agente `kubelet` se encarga de mantenerlo asi siempre
 
 ```bash
 kubectl get deployment
@@ -293,7 +319,7 @@ kubectl get deployment
 <details>
   <summary>Salida</summary>
 
-```bash
+```text
 NAME    READY   UP-TO-DATE   AVAILABLE   AGE
 nginx   1/1     1            1           65m
 ```
@@ -360,11 +386,10 @@ kubectl delete deployment nginx-deployment
 ___
 ### [Daemonset](https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/)
 Es otro tipo de controlador de k8s y muy similar al deployment, pero no tiene réplicas, este controlador lo que hace es 
-desplegar un pod o pods por cada máquina que tenga el cluster, es similar a los deployments pero no tiene la propiedad para 
-setear las replicas los casos de uso mas frecuentes son:
+desplegar un pod por cada nodo que tenga el cluster, los casos de uso más frecuentes son:
 
 - Monitoreo de los nodos del cluster
-- Recoleccion de logs de los nodos del cluster
+- Recolección de logs de los nodos del cluster
 
 ```bash
 kubectl get daemonset
@@ -373,7 +398,7 @@ kubectl get daemonset
 <details>
   <summary>Salida</summary>
 
-```bash
+```text
 NAME               DESIRED   CURRENT   READY   UP-TO-DATE   AVAILABLE   NODE SELECTOR   AGE
 nginx-deployment   1         1         0       1            0           <none>          4s
 ```
@@ -441,7 +466,7 @@ ___
 ### [Statefulset](https://kubernetes.io/es/docs/concepts/workloads/controllers/statefulset/)
 También es una forma de crear pods, pero con un volumen asociado para mantener el estado, es decir que es como un deployment 
 en el que cada pod tiene asociado un volumen de almacenamiento unico por pod en donde el pod y solo ese pod lo usa para 
-mantener el estado de la aplicacion.
+mantener su estado, si el pod muere se crea otro pod y automáticamente este volumen se asocia al nuevo pod.
 
 <img height="600" src="images/statefulset.png"/>
 
@@ -514,12 +539,12 @@ kubectl delete statefulset simple-statefulset
 ____
 ## [Networking en k8s](https://kubernetes.io/docs/concepts/services-networking/)
 
-Las comunicaciones entre aplicaciones esta a la orden del dia, y es muy dificil encontrar una aplicacion hoy por hoy 
-que no necesite comunicarse con el entorno que le rodea. Esto no es distinto dentro de un cluster de k8s, es mas, de primeras
-complica más las cosas porque k8s va de compartir instancias o nodos entre aplicaciones, donde los pods pueden estar desplegados
-en distintos nodos y aun asi tiene que mantener la comunicacion.
+Las comunicaciónes entre aplicaciones esta a la orden del dia, y es muy difícil encontrar una aplicacion hoy por hoy 
+que no necesite comunicarse con el entorno que le rodea. Esto no es distinto dentro de un cluster, es más, de primeras
+complica más las cosas porque k8s va de compartir instancias o nodos entre cargas de trabajos, donde los pods pueden 
+estar desplegados en distintos nodos y aun asi tiene que mantener la comunicación.
 
-En esta parte de la [documentacion oficial](https://kubernetes.io/docs/concepts/services-networking/) puedes tener mas 
+En esta parte de la [documentacion oficial](https://kubernetes.io/docs/concepts/services-networking/) puedes tener más 
 detalle.
 
 ![](images/basic-networking-k8s.png)
@@ -537,9 +562,9 @@ En la imagen de arriba hay varias cosas que tenemos que tener en cuenta
 - Toda la informacion de las `route-tables` se almacena en `etcd`.
 
 En la imagen tenemos dos nodos con un pod en cada uno, si estos pods quieren comunicarse, el agente CNI almacenaria
-en `etcd` las `route-tables` para se pueda establecer la comunicacion entre pods, cuando se crea un pod una de las 
-primeras cosas que se hace es asignarle una ip, esto lo hace el agente del CNI, se almacena en `etcd`. Tambien se borra 
-esta configuracion cuando sé borrar el pod, todo esto es trasparente para nosotros y lo hace el propio CNI.
+en `etcd` las `route-tables` para se pueda establecer la comunicación entre pods, cuando se crea un pod una de las 
+primeras cosas que se hace es asignarle una ip, esto lo hace el agente del CNI, se almacena en `etcd`. También se borra 
+esta configuración cuando sé borrar el pod, todo esto es trasparente para nosotros y lo hace el propio CNI.
 
 **Articulos y videos destacados que hablan del tema**
 
@@ -551,20 +576,20 @@ esta configuracion cuando sé borrar el pod, todo esto es trasparente para nosot
 ____
 ### [Services](https://kubernetes.io/es/docs/concepts/services-networking/service/)
 
-Es un objeto de la API de k8s en el que se define como conectarnos a las aplicaciones o pods, básicamente un service 
-lo que hacemos es agrupar lógicamente un conjunto de pods y definir una politica de entrada, de esta forma no tenemos que 
-conocer la ip de los pods para comunicarnos. Existen distintos tipos de services:
+Es un objeto de la API de k8s en el que se define como conectarnos a los pods, básicamente un service 
+lo que hace es agrupar lógicamente un conjunto de pods y definir una politica de entrada, de esta forma no tenemos que 
+conocer la ip de los pods para comunicarnos. Existen distintos tipos de services, estos son los más comunes:
 
 * **ClusterIP**: expone una ip fija en el cluster. (Por defecto)
 * **NodePort**: expone un puerto en cada nodo.
 * **LoadBalancer**: crea un balanceador de carga (depende del proveedor de cloud que usemos) que redirecciona el tráfico 
 a los pods.
 
-#### [Service Cluster IP](https://kubernetes.io/es/docs/concepts/services-networking/service/#definiendo-un-service) (no recomendado para entornos productivos)
+#### [Service - Cluster IP](https://kubernetes.io/es/docs/concepts/services-networking/service/#definiendo-un-service) (no recomendado para entornos productivos)
 
-Este service se crea por defecto si no se define la etiqueta `type` en el manifiesto, se mapea 
+Este service se crea por defecto si no se define la etiqueta `spec.type` en el manifiesto, se mapea 
 una ip interna del cluster con la ip de los pods, este mapeo se realiza con la definicion de un selector el cual debe 
-estar presente e igual en el manifiesto del service y del deployment, asi el service puede identificar y agrupar las ips 
+estar presente en el manifiesto del service y del deployment, asi el service puede identificar y agrupar las ips 
 de los pods para que puedan ser alcanzadas por la ip del cluster cuando hacemos una petition a esta.
 
 <details>
@@ -686,7 +711,7 @@ Version: 1.0.0
 Hostname: app-service-cluster-ip-67cd8b5645-478tb
 ```
 
-#### [Service Node Port](https://kubernetes.io/es/docs/concepts/services-networking/service/#tipo-nodeport)
+#### [Service - Node Port](https://kubernetes.io/es/docs/concepts/services-networking/service/#tipo-nodeport)
 
 Este service expone un puerto en cada uno de los nodos del cluster y mapea el tráfico de ese puerto al service que 
 agrupa los pods de nuestra aplicacion.
@@ -741,7 +766,7 @@ ___
 http://192.168.49.2:30000
 ```
 
-#### [Service LoadBalancer](https://kubernetes.io/es/docs/concepts/services-networking/service/#loadbalancer)
+#### [Service - LoadBalancer](https://kubernetes.io/es/docs/concepts/services-networking/service/#loadbalancer)
 
 En este caso dependiendo de donde este montado el cluster cuando creamos un service de tipo load balancer crea algo similar 
 a un node port pero pone delante un load balancer para hacer de punto unico de entrada para los pods, si estamos en la nube
@@ -842,7 +867,7 @@ dependiendo la naturaleza de nuestro cluster podremos usar uno u otro,
 en este [enlace](https://kubernetes.io/docs/concepts/services-networking/ingress-controllers/) pueden ver algunos.
 
 Un ingress debería ser capas de balancear carga en nuestras aplicaciones como también manejar conexiones SSL/TLS, 
-la configuracion puede variar segun el proveedor del ingress controler.
+la configuración puede variar segun el proveedor del ingress controler.
 
 ![](images/ingress-basic-diagram.png)
 
@@ -965,7 +990,7 @@ Hostname: app-ingress-v2-6b68575fd9-jl9fz
 
 ## [ConfigMaps](https://kubernetes.io/es/docs/concepts/configuration/configmap/)
 
-Este objeto como su nombre lo indica almacena configuraciones que puedan ser consultadas por las aplicaciones, puedes 
+Este objeto como su nombre lo indica almacena configuraciónes que puedan ser consultadas por las aplicaciones, puedes 
 leer los configmaps desde un deployment e inyectarlos en los pods como variables de entorno o como un volumen que 
 inyecta un fichero de solo lectura para que los containers del pod lo usen.
 
@@ -1036,7 +1061,7 @@ kubectl exec -it pod-configmaps -- env
 ```
 ```bash
 ...
-DUMMY_VAR=dummy-value <<< Configuracion inyectada
+DUMMY_VAR=dummy-value <<< configuración inyectada
 ...
 ```
 
@@ -1048,7 +1073,7 @@ dummy-var=dummy-value
 ```
 
 >⚠ Importante saber que si actualizas los valores del configmap, en el pod solo se actualizaran los ficheros del volumen, 
-las variables de entorno seguirían siendo iguales. Para actualizar la configuracion se debería matar el pod para que 
+las variables de entorno seguirían siendo iguales. Para actualizar la configuración se debería matar el pod para que 
 el deployment cre un pod nuevo y se mapeen los nuevos valores desde el configmap.
 
 >⚠ En caso de crear un pod y no existir el `configmap` saltarán errores y no se podría crear el pod.
@@ -1088,7 +1113,9 @@ kubectl apply -f ./files/simple-secrets.yaml
 También podemos crear el secret con kubectl con el siguiente comando
 
 ```bash
-kubectl create secret generic simple-secrets --from-literal=username=admin --from-literal=password=superpassword
+kubectl create secret generic simple-secrets \
+  --from-literal=username=admin \
+  --from-literal=password=superpassword
 ```
 
 <details>
