@@ -1,15 +1,19 @@
 # Mini Curso k8s
 
+<img src="images/logo-k8s.png" width="50"/>
+
 ### Fuentes
 
-- PeladoNerd - [Canal YouTube](https://www.youtube.com/channel/UCrBzBOMcUVV8ryyAU_c6P5g)
-    - Video [KUBERNETES 2021 - De NOVATO a PRO! (CURSO COMPLETO)](https://www.youtube.com/watch?v=DCoBcpOA7W4)
+- **PeladoNerd** - [Canal YouTube](https://www.youtube.com/channel/UCrBzBOMcUVV8ryyAU_c6P5g)
+    - **Video** [KUBERNETES 2021 - De NOVATO a PRO! (CURSO COMPLETO)](https://www.youtube.com/watch?v=DCoBcpOA7W4)
 
-Documentacion oficial de k8s: https://kubernetes.io/es/
+**Documentacion oficial de k8s: [AQUI](https://kubernetes.io/es/)**
 
-#### Herramientas esenciales
+**Review de la api de k8s: [AQUI](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#-strong-api-overview-strong-)**
 
-#### Instalar `kubectl` [link](https://kubernetes.io/docs/tasks/tools/)
+## Herramientas esenciales
+
+### Instalar `kubectl` [link](https://kubernetes.io/docs/tasks/tools/)
 
 <details>
   <summary>En linux</summary>
@@ -51,7 +55,7 @@ Comprobar
   </details>
 </details>
 
-#### Instalar `Minikube` [link](https://minikube.sigs.k8s.io/docs/start/)
+### Instalar `Minikube` [link](https://minikube.sigs.k8s.io/docs/start/)
 
 <details>
   <summary>En linux</summary>
@@ -85,9 +89,9 @@ Comprobar
   </details>
 </details>
 
-#### Otras herramientas interesantes para chequear
+## Otras herramientas interesantes para chequear
 
-#### Instalar `kubecolor` [link](https://github.com/hidetatz/kubecolor/releases)
+### Instalar `kubecolor` [link](https://github.com/hidetatz/kubecolor/releases)
 
 <details>
   <summary>En linux</summary>
@@ -131,7 +135,7 @@ En el fichero del profile para la terminal (ejemplo: `~/.bashrc`) poner el alias
 
 </details>
 
-**Lens Desktop** - Un IDE para k8s - **[Link](https://k8slens.dev/desktop.html)**
+### **Lens Desktop** - Un IDE para k8s - **[Link](https://k8slens.dev/desktop.html)**
 
 <details>
   <summary>En linux</summary>
@@ -156,7 +160,7 @@ lens --version
 
 </details>
 
-### Manos a la obra
+## Manos a la obra
 
 Montar el cluster en local con `minikube`
 
@@ -251,8 +255,8 @@ kubectl delete namespace simple-namespace
 ___
 
 ### [Pods](https://kubernetes.io/docs/concepts/workloads/pods/)
-Son las unidades más pequeñas que se pueden desplegar dentro de un cluster de kubernetes, es la forma que tiene k8s de
-agrupar uno o varios contenedores para las cargas de trabajo. Dentro de un pod pueden existir varios container, tambien 
+Son las unidades más pequeñas que se pueden desplegar en k8s, es la forma que tiene k8s de agrupar uno o varios 
+contenedores para las cargas de trabajo. Dentro de un pod pueden existir varios container, también 
 se les pueden adjuntar volumenes o volumenes persistentes. Los contenedores dentro del pod comparten IP y dentro del pod 
 la comunicación entre contenedores puedes realizarla con `localhost`.
 
@@ -300,16 +304,16 @@ spec:
 ___
 
 ### [Deployment](https://kubernetes.io/es/docs/concepts/workloads/controllers/deployment/)
-Es un tipo de controlador de k8s, es la unidad de más alto nivel que podemos gestionar en Kubernetes. 
-Nos permite definir diferentes funciones:
+Es un tipo de controlador de k8s, es la unidad de más alto nivel que podemos gestionar en k8s. Nos permite definir 
+diferentes funciones:
 
-- Control de réplicas.
+- Control de réplicas
 - Escalabilidad de pods
 - Actualizaciones continuas
 - Despliegues automáticos
 - Rollback a versiones anteriores
 
-La idea es manejar las cargas de trabajo basándonos en este controlador. Podemos definir el estado que deseado y 
+La idea es manejar las cargas de trabajo basándonos en este controlador. Podemos definir el estado deseado y 
 el agente `kubelet` se encarga de mantenerlo asi siempre
 
 ```bash
@@ -564,7 +568,7 @@ En la imagen de arriba hay varias cosas que tenemos que tener en cuenta
 En la imagen tenemos dos nodos con un pod en cada uno, si estos pods quieren comunicarse, el agente CNI almacenaria
 en `etcd` las `route-tables` para se pueda establecer la comunicación entre pods, cuando se crea un pod una de las 
 primeras cosas que se hace es asignarle una ip, esto lo hace el agente del CNI, se almacena en `etcd`. También se borra 
-esta configuración cuando sé borrar el pod, todo esto es trasparente para nosotros y lo hace el propio CNI.
+esta configuración cuando sé borrar el pod, todo esto es trasparente para nosotros y lo hace el agente del CNI.
 
 **Articulos y videos destacados que hablan del tema**
 
@@ -636,7 +640,7 @@ Si listamos todo el cluster podemos ver que estarían los pods creados por el de
 como también el service `service/service-cluster-ip` que estaba en el deployment 
 (pudimos declarar el service en un manifiesto aparte también)
 
-```bash
+```text
 NAME                                          READY   STATUS    RESTARTS   AGE   IP           NODE       NOMINATED NODE   READINESS GATES
 pod/app-service-cluster-ip-67cd8b5645-4tgr4   1/1     Running   0          20s   172.17.0.7   minikube   <none>           <none>
 pod/app-service-cluster-ip-67cd8b5645-9dxsw   1/1     Running   0          20s   172.17.0.5   minikube   <none>           <none>
@@ -647,10 +651,10 @@ service/kubernetes           ClusterIP   10.96.0.1      <none>        443/TCP   
 service/service-cluster-ip   ClusterIP   10.99.100.91   <none>        8080/TCP   20s     role=role-cluster-ip
 ```
 
-Si describimos el service podemos encontrar mas information 
+Si describimos el service podemos encontrar más information 
 
 ```bash
-kubectl describe svc service-cluster-ip
+kubectl describe service service-cluster-ip
 ```
 
 <details>
@@ -720,7 +724,7 @@ agrupa los pods de nuestra aplicacion.
   <summary>Manifiesto de un service Node Port</summary>
 
 Nótese que a diferencia del manifiesto de cluster ip, node port tiene que tener `spec.type` igual a `NodePort` y para 
-crear el puerto en cada uno de los nodos y que quede expuesto tambien la etiqueta `spec.ports[].nodePort` con el número 
+crear el puerto en cada uno de los nodos y que quede expuesto también la etiqueta `spec.ports[].nodePort` con el número 
 del puerto que queremos exponer.
 
 ```yaml
@@ -769,7 +773,7 @@ http://192.168.49.2:30000
 #### [Service - LoadBalancer](https://kubernetes.io/es/docs/concepts/services-networking/service/#loadbalancer)
 
 En este caso dependiendo de donde este montado el cluster cuando creamos un service de tipo load balancer crea algo similar 
-a un node port pero pone delante un load balancer para hacer de punto unico de entrada para los pods, si estamos en la nube
+a un node port, pero pone delante un loadbalancer para hacer de punto unico de entrada para los pods, si estamos en la nube
 creara un balanceador segun el proveedor de nube, en el caso de `minikube` se debe tener abierto una terminal corriendo 
 un comando para que el service pueda tomar una ip y exponer los pods de la aplicacion.
 
@@ -797,7 +801,7 @@ Si no configuramos la propiedad `spec.ports[].nodePort` k8s nos provee de un pue
 
 Para crear un service de este tipo con `minikube`:
 
-En una termina aparte ejecutamos el siguiente comando para levantar un `tunnel` y poder conectar el load balancer, dejaremos
+En una termina aparte ejecutamos el siguiente comando para levantar un `tunnel` y poder conectar al loadbalancer, dejaremos
 el comando ejecutando sin cerrar la terminal
 
 ```bash
@@ -808,6 +812,7 @@ minikube tunnel
   <summary>Salida</summary>
 
 ```bash
+...
 Status: 
     machine: minikube
     pid: 125254
@@ -818,6 +823,7 @@ errors:
     minikube: no errors
     router: no errors
     loadbalancer emulator: no errors
+...
 ```
 </details>
 
@@ -833,7 +839,7 @@ Ahora si vemos que tenemos desplegado en el cluster deberíamos tener algo simil
 kubectl get all -o wide
 ```
 
-```bash
+```text
 NAME                                             READY   STATUS    RESTARTS   AGE   IP           NODE       NOMINATED NODE   READINESS GATES
 pod/app-service-load-balancer-57f56b48c8-7gbjq   1/1     Running   0          7s    172.17.0.7   minikube   <none>           <none>
 pod/app-service-load-balancer-57f56b48c8-f6sbq   1/1     Running   0          7s    172.17.0.4   minikube   <none>           <none>
@@ -844,7 +850,7 @@ service/kubernetes              ClusterIP      10.96.0.1        <none>          
 service/service-load-balancer   LoadBalancer   10.105.169.212   10.105.169.212   80:30000/TCP   7s     role=role-load-balancer
 ```
 
-Si copiamos la Ip externa del `service/service-load-balancer` y la abrimos en un navegador o hacemos un curl desde 
+Si copiamos la **Ip** externa del `service/service-load-balancer` y la abrimos en un navegador o hacemos un curl desde 
 consola deberíamos poder llagar a los pods y balancear sobre ellos con distintas respuestas.
 
 ```bash
@@ -863,8 +869,8 @@ punto de entrada, en donde podemos apuntar a distintas aplicaciones o deployment
 en la url o reglas en el manifiesto del ingress. 
 
 Podemos decir que los ingress son una pieza externa y que debemos instalarla en el cluster, existen varios proveedores, 
-dependiendo la naturaleza de nuestro cluster podremos usar uno u otro,
-en este [enlace](https://kubernetes.io/docs/concepts/services-networking/ingress-controllers/) pueden ver algunos.
+dependiendo la naturaleza de nuestro cluster podremos usar uno u otro, en este [enlace](https://kubernetes.io/docs/concepts/services-networking/ingress-controllers/) 
+pueden ver algunos.
 
 Un ingress debería ser capas de balancear carga en nuestras aplicaciones como también manejar conexiones SSL/TLS, 
 la configuración puede variar segun el proveedor del ingress controler.
@@ -872,7 +878,7 @@ la configuración puede variar segun el proveedor del ingress controler.
 ![](images/ingress-basic-diagram.png)
 
 En la imagen se aprecia como funciona el acceso de un ingress a nuestras aplicaciones, el cliente hace una 
-peticion al ingress el cual evalua las reglas de enrutamiento definidas en el manifiesto, esta reglas tienen asociado un
+peticion al ingress el cual evalua las reglas de enrutamiento definidas en el manifiesto, estas reglas tienen asociado un
 `service` el cual a su vez tiene como target los pods del deployment de nuestras aplicacions. 
 
 Asi desde un unico punto de entrada se pueden hacer peticiones a distintas aplicaciones, con los services no podríamos hacer esto. 
@@ -990,7 +996,7 @@ Hostname: app-ingress-v2-6b68575fd9-jl9fz
 
 ## [ConfigMaps](https://kubernetes.io/es/docs/concepts/configuration/configmap/)
 
-Este objeto como su nombre lo indica almacena configuraciónes que puedan ser consultadas por las aplicaciones, puedes 
+Este objeto como su nombre lo indica almacena configuraciones que puedan ser consultadas por las aplicaciones, puedes 
 leer los configmaps desde un deployment e inyectarlos en los pods como variables de entorno o como un volumen que 
 inyecta un fichero de solo lectura para que los containers del pod lo usen.
 
@@ -1076,7 +1082,7 @@ dummy-var=dummy-value
 las variables de entorno seguirían siendo iguales. Para actualizar la configuración se debería matar el pod para que 
 el deployment cre un pod nuevo y se mapeen los nuevos valores desde el configmap.
 
->⚠ En caso de crear un pod y no existir el `configmap` saltarán errores y no se podría crear el pod.
+>⚠ En caso de crear un pod y no existir él `configmap` saltarán errores y no se podría crear el pod.
 
 ```bash
 ...
@@ -1104,7 +1110,7 @@ data:
   password: c3VwM3JwYXNzdzByZAo=
 ```
 
-Crear un secret desde un minifiesto
+Crear un secret desde un manifiesto
 
 ```bash
 kubectl apply -f ./files/simple-secrets.yaml
