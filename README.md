@@ -616,7 +616,7 @@ conocer la ip de los pods para comunicarnos. Existen distintos tipos de services
 * **LoadBalancer**: crea un balanceador de carga (depende del proveedor de cloud que usemos) que redirecciona el tráfico 
 a los pods.
 
-#### [Service - Cluster IP](https://kubernetes.io/es/docs/concepts/services-networking/service/#definiendo-un-service) (no recomendado para entornos productivos)
+#### [Service Cluster IP](https://kubernetes.io/es/docs/concepts/services-networking/service/#definiendo-un-service) (no recomendado para entornos productivos)
 
 Este service se crea por defecto si no se define la etiqueta `spec.type` en el manifiesto, se mapea 
 una ip interna del cluster con la ip de los pods, este mapeo se realiza con la definicion de un selector el cual debe 
@@ -742,7 +742,7 @@ Version: 1.0.0
 Hostname: app-service-cluster-ip-67cd8b5645-478tb
 ```
 
-#### [Service - Node Port](https://kubernetes.io/es/docs/concepts/services-networking/service/#tipo-nodeport)
+#### [Service Node Port](https://kubernetes.io/es/docs/concepts/services-networking/service/#tipo-nodeport)
 
 Este service expone un puerto en cada uno de los nodos del cluster y mapea el tráfico de ese puerto al service que 
 agrupa los pods de nuestra aplicacion.
@@ -797,7 +797,7 @@ ___
 http://192.168.49.2:30000
 ```
 
-#### [Service - LoadBalancer](https://kubernetes.io/es/docs/concepts/services-networking/service/#loadbalancer)
+#### [Service LoadBalancer](https://kubernetes.io/es/docs/concepts/services-networking/service/#loadbalancer)
 
 En este caso dependiendo de donde este montado el cluster cuando creamos un service de tipo load balancer crea algo similar 
 a un node port, pero pone delante un loadbalancer para hacer de punto unico de entrada para los pods, si estamos en la nube
