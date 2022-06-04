@@ -16,7 +16,7 @@
 
 Entorno
 - [Herramientas esenciales](#herramientas-esenciales)
-  - kubectl
+  - [kubectl](#instalar-kubectl)
   - minikube
 - Otras herramientas
 
