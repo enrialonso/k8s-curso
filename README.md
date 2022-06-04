@@ -19,8 +19,22 @@ Entorno
   - [kubectl](#instalar-kubectl-link)
   - [minikube](#instalar-minikube-link)
 - [Otras herramientas](#otras-herramientas)
-- Manos a la obra
+- Cluster
   - [Cluster en local minikube](#cluster-en-local-con-minikube)
+- Conceptos basicos k8s
+  - [Namespaces](#namespaces)
+  - [Pods](#pods)
+  - [Deployment](#deployment)
+  - [Daemonset](#daemonset)
+  - [Statefulset](#statefulset)
+  - [Networking en k8s](#networking-en-k8s)
+  - [Services](#services)
+    - [Cluster IP](#service-cluster-ip)
+    - [Node Port](#service-node-port)
+    - [Load Balancer](#serviceload-balancer)
+  - [Ingress](#ingress)
+  - [Configmaps](#configmaps)
+  - [Secrets](#secrets)
 
 
 ## Herramientas esenciales
