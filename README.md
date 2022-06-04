@@ -17,8 +17,10 @@
 Entorno
 - [Herramientas esenciales](#herramientas-esenciales)
   - [kubectl](#instalar-kubectl-link)
-  - minikube
-- Otras herramientas
+  - [minikube](#instalar-minikube-link)
+- [Otras herramientas](#otras-herramientas)
+- Manos a la obra
+  - [Cluster en local minikube](#Montar-el-cluster-en-local-con-minikube)
 
 
 ## Herramientas esenciales
@@ -99,7 +101,8 @@ Comprobar
   </details>
 </details>
 
-## Otras herramientas interesantes para chequear
+## Otras herramientas 
+No esenciales, pero está bueno conocer
 
 ### Instalar `kubecolor` [link](https://github.com/hidetatz/kubecolor/releases)
 
