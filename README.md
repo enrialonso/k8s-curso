@@ -568,6 +568,7 @@ Borrar statefulset
 kubectl delete statefulset simple-statefulset
 ```
 ____
+
 ## [Networking en k8s](https://kubernetes.io/docs/concepts/services-networking/)
 
 Las comunicaciónes entre aplicaciones esta a la orden del dia, y es muy difícil encontrar una aplicacion hoy por hoy 
@@ -616,7 +617,8 @@ conocer la ip de los pods para comunicarnos. Existen distintos tipos de services
 * **LoadBalancer**: crea un balanceador de carga (depende del proveedor de cloud que usemos) que redirecciona el tráfico 
 a los pods.
 
-### [Service Cluster IP](https://kubernetes.io/es/docs/concepts/services-networking/service/#definiendo-un-service) (no recomendado para entornos productivos)
+### [Service Cluster IP](https://kubernetes.io/es/docs/concepts/services-networking/service/#definiendo-un-service) 
+⚠ no recomendado para entornos productivos
 
 Este service se crea por defecto si no se define la etiqueta `spec.type` en el manifiesto, se mapea 
 una ip interna del cluster con la ip de los pods, este mapeo se realiza con la definicion de un selector el cual debe 
