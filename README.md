@@ -1,6 +1,6 @@
 # Mini Curso k8s
 
-<img src="images/logo-k8s.png" width="50"/>
+<img src="images/logo-k8s.png" width="50" alt="k8s-logo"/>
 
 ### Fuentes
 
@@ -14,7 +14,6 @@
 
 ## Indice de contenido
 
-Entorno
 - [Herramientas esenciales](#herramientas-esenciales)
   - [kubectl](#instalar-kubectl-link)
   - [minikube](#instalar-minikube-link)
@@ -208,7 +207,7 @@ minikube dashboard
 Con este comando abre en el navegador un dashboard web que está instalado por defecto en nuestro `minikube` para 
 interactuar con el cluster y obtener informacion de nuestro cluster.
 
-<img height="400" src="images/minikube-dashboard.png"/>
+<img height="400" src="images/minikube-dashboard.png" alt="minikube-dashboard-localhost"/>
 
 ```bash
 minikube addons list
@@ -239,7 +238,7 @@ Kubernetes soporta múltiples clústeres virtuales respaldados por el mismo clú
 denominan namespaces. Puedes separar de forma logica las cargas de trabajo dentro del cluster. 
 Existe algunos namespaces por defecto `default` por ejemplo.
 
-<img height="500" src="images/k8s-namespaces.png"/>
+<img height="500" src="images/k8s-namespaces.png" alt="k8s-namespaces"/>
 
 ```bash
 kubectl get namespaces
@@ -499,7 +498,7 @@ También es una forma de crear pods, pero con un volumen asociado para mantener 
 en el que cada pod tiene asociado un volumen de almacenamiento unico por pod en donde el pod y solo ese pod lo usa para 
 mantener su estado, si el pod muere se crea otro pod y automáticamente este volumen se asocia al nuevo pod.
 
-<img height="600" src="images/statefulset.png"/>
+<img height="600" src="images/statefulset.png" alt="k8s-statefullset"/>
 
 ```bash
 kubectl get statefulset
