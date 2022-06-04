@@ -31,7 +31,7 @@ Entorno
   - [Services](#services)
     - [Cluster IP](#service-cluster-ip)
     - [Node Port](#service-node-port)
-    - [Load Balancer](#serviceload-balancer)
+    - [Load Balancer](#service-load-balancer)
   - [Ingress](#ingress)
   - [Configmaps](#configmaps)
   - [Secrets](#secrets)
@@ -616,7 +616,7 @@ conocer la ip de los pods para comunicarnos. Existen distintos tipos de services
 * **LoadBalancer**: crea un balanceador de carga (depende del proveedor de cloud que usemos) que redirecciona el tráfico 
 a los pods.
 
-#### [Service Cluster IP](https://kubernetes.io/es/docs/concepts/services-networking/service/#definiendo-un-service) (no recomendado para entornos productivos)
+### [Service Cluster IP](https://kubernetes.io/es/docs/concepts/services-networking/service/#definiendo-un-service) (no recomendado para entornos productivos)
 
 Este service se crea por defecto si no se define la etiqueta `spec.type` en el manifiesto, se mapea 
 una ip interna del cluster con la ip de los pods, este mapeo se realiza con la definicion de un selector el cual debe 
