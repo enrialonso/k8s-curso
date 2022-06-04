@@ -20,7 +20,7 @@ Entorno
   - [minikube](#instalar-minikube-link)
 - [Otras herramientas](#otras-herramientas)
 - Manos a la obra
-  - [Cluster en local minikube](#Montar-el-cluster-en-local-con-minikube)
+  - [Cluster en local minikube](#cluster-en-local-con-minikube)
 
 
 ## Herramientas esenciales
@@ -175,7 +175,7 @@ lens --version
 
 ## Manos a la obra
 
-Montar el cluster en local con `minikube`
+#### Cluster en local con `minikube`
 
 La idea es montar un cluster en local y poder jugar con él aprendiendo los conceptos base. Para esto usaremos `minikube` 
 y como interfase con el cluster usaremos `kubectl`.
