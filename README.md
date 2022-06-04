@@ -1,6 +1,6 @@
 # Mini Curso k8s
 
-<img src="images/logo-k8s.png" width="50"/>
+<img src="images/logo-k8s.png" width="50" alt="k8s-logo"/>
 
 ### Fuentes
 
@@ -10,6 +10,31 @@
 **Documentacion oficial de k8s: [AQUI](https://kubernetes.io/es/)**
 
 **Review de la api de k8s: [AQUI](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#-strong-api-overview-strong-)**
+
+
+## Indice de contenido
+
+- [Herramientas esenciales](#herramientas-esenciales)
+  - [kubectl](#instalar-kubectl-link)
+  - [minikube](#instalar-minikube-link)
+- [Otras herramientas](#otras-herramientas)
+- Cluster
+  - [Cluster en local minikube](#cluster-en-local-con-minikube)
+- Conceptos basicos k8s
+  - [Namespaces](#namespaces)
+  - [Pods](#pods)
+  - [Deployment](#deployment)
+  - [Daemonset](#daemonset)
+  - [Statefulset](#statefulset)
+  - [Networking en k8s](#networking-en-k8s)
+  - [Services](#services)
+    - [Cluster IP](#service-cluster-ip)
+    - [Node Port](#service-node-port)
+    - [Load Balancer](#service-load-balancer)
+  - [Ingress](#ingress)
+  - [Configmaps](#configmaps)
+  - [Secrets](#secrets)
+
 
 ## Herramientas esenciales
 
@@ -89,7 +114,8 @@ Comprobar
   </details>
 </details>
 
-## Otras herramientas interesantes para chequear
+## Otras herramientas 
+No esenciales, pero está bueno conocer
 
 ### Instalar `kubecolor` [link](https://github.com/hidetatz/kubecolor/releases)
 
@@ -162,7 +188,7 @@ lens --version
 
 ## Manos a la obra
 
-Montar el cluster en local con `minikube`
+#### Cluster en local con `minikube`
 
 La idea es montar un cluster en local y poder jugar con él aprendiendo los conceptos base. Para esto usaremos `minikube` 
 y como interfase con el cluster usaremos `kubectl`.
@@ -181,7 +207,7 @@ minikube dashboard
 Con este comando abre en el navegador un dashboard web que está instalado por defecto en nuestro `minikube` para 
 interactuar con el cluster y obtener informacion de nuestro cluster.
 
-<img height="400" src="images/minikube-dashboard.png"/>
+<img height="400" src="images/minikube-dashboard.png" alt="minikube-dashboard-localhost"/>
 
 ```bash
 minikube addons list
@@ -212,7 +238,7 @@ Kubernetes soporta múltiples clústeres virtuales respaldados por el mismo clú
 denominan namespaces. Puedes separar de forma logica las cargas de trabajo dentro del cluster. 
 Existe algunos namespaces por defecto `default` por ejemplo.
 
-<img height="500" src="images/k8s-namespaces.png"/>
+<img height="500" src="images/k8s-namespaces.png" alt="k8s-namespaces"/>
 
 ```bash
 kubectl get namespaces
@@ -472,7 +498,7 @@ También es una forma de crear pods, pero con un volumen asociado para mantener 
 en el que cada pod tiene asociado un volumen de almacenamiento unico por pod en donde el pod y solo ese pod lo usa para 
 mantener su estado, si el pod muere se crea otro pod y automáticamente este volumen se asocia al nuevo pod.
 
-<img height="600" src="images/statefulset.png"/>
+<img height="600" src="images/statefulset.png" alt="k8s-statefullset"/>
 
 ```bash
 kubectl get statefulset
@@ -541,6 +567,7 @@ Borrar statefulset
 kubectl delete statefulset simple-statefulset
 ```
 ____
+
 ## [Networking en k8s](https://kubernetes.io/docs/concepts/services-networking/)
 
 Las comunicaciónes entre aplicaciones esta a la orden del dia, y es muy difícil encontrar una aplicacion hoy por hoy 
@@ -589,7 +616,8 @@ conocer la ip de los pods para comunicarnos. Existen distintos tipos de services
 * **LoadBalancer**: crea un balanceador de carga (depende del proveedor de cloud que usemos) que redirecciona el tráfico 
 a los pods.
 
-#### [Service - Cluster IP](https://kubernetes.io/es/docs/concepts/services-networking/service/#definiendo-un-service) (no recomendado para entornos productivos)
+### [Service Cluster IP](https://kubernetes.io/es/docs/concepts/services-networking/service/#definiendo-un-service) 
+⚠ no recomendado para entornos productivos
 
 Este service se crea por defecto si no se define la etiqueta `spec.type` en el manifiesto, se mapea 
 una ip interna del cluster con la ip de los pods, este mapeo se realiza con la definicion de un selector el cual debe 
@@ -715,7 +743,7 @@ Version: 1.0.0
 Hostname: app-service-cluster-ip-67cd8b5645-478tb
 ```
 
-#### [Service - Node Port](https://kubernetes.io/es/docs/concepts/services-networking/service/#tipo-nodeport)
+#### [Service Node Port](https://kubernetes.io/es/docs/concepts/services-networking/service/#tipo-nodeport)
 
 Este service expone un puerto en cada uno de los nodos del cluster y mapea el tráfico de ese puerto al service que 
 agrupa los pods de nuestra aplicacion.
@@ -770,7 +798,7 @@ ___
 http://192.168.49.2:30000
 ```
 
-#### [Service - LoadBalancer](https://kubernetes.io/es/docs/concepts/services-networking/service/#loadbalancer)
+#### [Service LoadBalancer](https://kubernetes.io/es/docs/concepts/services-networking/service/#loadbalancer)
 
 En este caso dependiendo de donde este montado el cluster cuando creamos un service de tipo load balancer crea algo similar 
 a un node port, pero pone delante un loadbalancer para hacer de punto unico de entrada para los pods, si estamos en la nube
