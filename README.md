@@ -379,6 +379,11 @@ Crear deployment
 ```bash
 kubectl apply -f ./files/simple-deployment.yaml
 ```
+
+Crear deployment desde comandos, con el modo dry-run:
+```bash
+kubectl create deploy -n default my-app --image=nginx --dry-run=client -o yaml > /tmp/test.yaml
+```
 Estado del deployment
 ```bash
 kubectl get deployment nginx-deployment
