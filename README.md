@@ -11,6 +11,16 @@
 
 **Review de la api de k8s: [AQUI](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#-strong-api-overview-strong-)**
 
+
+## Indice de contenido
+
+Entorno
+- [Herramientas esenciales](#herramientas-esenciales)
+  - kubectl
+  - minikube
+- Otras herramientas
+
+
 ## Herramientas esenciales
 
 ### Instalar `kubectl` [link](https://kubernetes.io/docs/tasks/tools/)
